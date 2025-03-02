@@ -186,20 +186,27 @@ package() {
       "BiosVideo.efi"
       "CrScreenshotDxe.efi"
       "Dhcp4Dxe.efi"
+      "Dhcp6Dxe.efi"
       "DnsDxe.efi"
       "DpcDxe.efi"
       "Ext4Dxe.efi"
+      "FirmwareSettingsEntry.efi"
+      "Hash2DxeCrypto.efi"
       "HiiDatabase.efi"
       "HttpBootDxe.efi"
       "HttpDxe.efi"
       "HttpUtilitiesDxe.efi"
       "Ip4Dxe.efi"
+      "Ip6Dxe.efi"
       "MnpDxe.efi"
+      "Mtftp4Dxe.efi"
+      "Mtftp6Dxe.efi"
       "NvmExpressDxe.efi"
       "OpenCanopy.efi"
       "OpenHfsPlus.efi"
       "OpenLegacyBoot.efi"
       "OpenLinuxBoot.efi"
+      "OpenNetworkBoot.efi"
       "OpenNtfsDxe.efi"
       "OpenPartitionDxe.efi"
       "OpenRuntime.efi"
@@ -207,11 +214,16 @@ package() {
       "OpenVariableRuntimeDxe.efi"
       "Ps2KeyboardDxe.efi"
       "Ps2MouseDxe.efi"
+      "RamDiskDxe.efi"
       "ResetNvramEntry.efi"
+      "RngDxe.efi"
       "SnpDxe.efi"
       "TcpDxe.efi"
+      "TlsDxe.efi"
       "ToggleSipEntry.efi"
       "Udp4Dxe.efi"
+      "Udp6Dxe.efi"
+      "UefiPxeBcDxe.efi"
       "UsbMouseDxe.efi"
       "XhciDxe.efi"
       )
@@ -260,7 +272,7 @@ package() {
     "Launchd.command"
     "Launchd.command.plist"
     "README.md"
-    "nvramdump"
+    "Legacy/nvramdump"
     )
   for file in "${logoutFiles[@]}"; do
     cp "${selfdir}/Utilities/LogoutHook/${file}" "${dstdir}/Utilities/LogoutHook"/ || exit 1
@@ -377,11 +389,11 @@ if [ "$ARCHS" = "" ]; then
 fi
 SELFPKG=OpenCorePkg
 NO_ARCHIVES=0
-DISCARD_PACKAGES=OpenCorePkg
+DISCARD_SUBMODULES=OpenCorePkg
 
 export SELFPKG
 export NO_ARCHIVES
-export DISCARD_PACKAGES
+export DISCARD_SUBMODULES
 
 src=$(curl -LfsS https://raw.githubusercontent.com/acidanthera/ocbuild/master/efibuild.sh) && eval "$src" || exit 1
 

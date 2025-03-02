@@ -73,6 +73,7 @@ OC_STRUCTORS (OC_PLATFORM_NVRAM_CONFIG, ())
 OC_STRUCTORS (OC_PLATFORM_SMBIOS_CONFIG, ())
 OC_STRUCTORS (OC_PLATFORM_CONFIG, ())
 
+OC_ARRAY_STRUCTORS (OC_UEFI_UNLOAD_ARRAY)
 OC_STRUCTORS (OC_UEFI_DRIVER_ENTRY, ())
 OC_ARRAY_STRUCTORS (OC_UEFI_DRIVER_ARRAY)
 OC_STRUCTORS (OC_UEFI_APFS, ())
@@ -183,12 +184,14 @@ OC_SCHEMA
   mBooterQuirksSchema[] = {
   OC_SCHEMA_BOOLEAN_IN ("AllowRelocationBlock",   OC_GLOBAL_CONFIG, Booter.Quirks.AllowRelocationBlock),
   OC_SCHEMA_BOOLEAN_IN ("AvoidRuntimeDefrag",     OC_GLOBAL_CONFIG, Booter.Quirks.AvoidRuntimeDefrag),
+  OC_SCHEMA_BOOLEAN_IN ("ClearTaskSwitchBit",     OC_GLOBAL_CONFIG, Booter.Quirks.ClearTaskSwitchBit),
   OC_SCHEMA_BOOLEAN_IN ("DevirtualiseMmio",       OC_GLOBAL_CONFIG, Booter.Quirks.DevirtualiseMmio),
   OC_SCHEMA_BOOLEAN_IN ("DisableSingleUser",      OC_GLOBAL_CONFIG, Booter.Quirks.DisableSingleUser),
   OC_SCHEMA_BOOLEAN_IN ("DisableVariableWrite",   OC_GLOBAL_CONFIG, Booter.Quirks.DisableVariableWrite),
   OC_SCHEMA_BOOLEAN_IN ("DiscardHibernateMap",    OC_GLOBAL_CONFIG, Booter.Quirks.DiscardHibernateMap),
   OC_SCHEMA_BOOLEAN_IN ("EnableSafeModeSlide",    OC_GLOBAL_CONFIG, Booter.Quirks.EnableSafeModeSlide),
   OC_SCHEMA_BOOLEAN_IN ("EnableWriteUnprotector", OC_GLOBAL_CONFIG, Booter.Quirks.EnableWriteUnprotector),
+  OC_SCHEMA_BOOLEAN_IN ("FixupAppleEfiImages",    OC_GLOBAL_CONFIG, Booter.Quirks.FixupAppleEfiImages),
   OC_SCHEMA_BOOLEAN_IN ("ForceBooterSignature",   OC_GLOBAL_CONFIG, Booter.Quirks.ForceBooterSignature),
   OC_SCHEMA_BOOLEAN_IN ("ForceExitBootServices",  OC_GLOBAL_CONFIG, Booter.Quirks.ForceExitBootServices),
   OC_SCHEMA_BOOLEAN_IN ("ProtectMemoryRegions",   OC_GLOBAL_CONFIG, Booter.Quirks.ProtectMemoryRegions),
@@ -853,6 +856,10 @@ OC_SCHEMA
 
 STATIC
 OC_SCHEMA
+  mUefiUnloadSchema = OC_SCHEMA_STRING (NULL);
+
+STATIC
+OC_SCHEMA
   mUefiConfigurationSchema[] = {
   OC_SCHEMA_DICT ("APFS",                 mUefiApfsSchema),
   OC_SCHEMA_DICT ("AppleInput",           mUefiAppleInputSchema),
@@ -864,6 +871,7 @@ OC_SCHEMA
   OC_SCHEMA_DICT ("ProtocolOverrides",    mUefiProtocolOverridesSchema),
   OC_SCHEMA_DICT ("Quirks",               mUefiQuirksSchema),
   OC_SCHEMA_ARRAY_IN ("ReservedMemory",   OC_GLOBAL_CONFIG,             Uefi.ReservedMemory, &mUefiReservedMemorySchema),
+  OC_SCHEMA_ARRAY_IN ("Unload",           OC_GLOBAL_CONFIG,             Uefi.Unload,         &mUefiUnloadSchema),
 };
 
 //

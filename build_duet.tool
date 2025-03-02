@@ -25,17 +25,23 @@ imgbuild() {
   LzmaCompress -e -o "${BUILD_DIR}/FV/DUETEFIMAINFVBLOCKIO${arch}.z" \
     "${BUILD_DIR}/FV/DUETEFIMAINFVBLOCKIO${arch}.Fv" || exit 1
 
-  echo "Compressing DxeCore.efi..."
+  echo "Compressing DxeCoreUe.raw..."
+  ImageTool GenImage -c UE -o "${BUILD_DIR_ARCH}/DxeCoreUe.raw" "${BUILD_DIR_ARCH}/DxeCore.efi"
   LzmaCompress -e -o "${BUILD_DIR}/FV/DxeMain${arch}.z" \
-    "${BUILD_DIR_ARCH}/DxeCore.efi" || exit 1
+    "${BUILD_DIR_ARCH}/DxeCoreUe.raw" || exit 1
 
-  echo "Compressing DxeIpl.efi..."
+  echo "Compressing DxeIplUe.raw..."
+  ImageTool GenImage -c UE -o "${BUILD_DIR_ARCH}/DxeIplUe.raw" "${BUILD_DIR_ARCH}/DxeIpl.efi"
   LzmaCompress -e -o "${BUILD_DIR}/FV/DxeIpl${arch}.z" \
-    "$BUILD_DIR_ARCH/DxeIpl.efi" || exit 1
+    "${BUILD_DIR_ARCH}/DxeIplUe.raw" || exit 1
 
   echo "Generating Loader Image..."
-
-  ImageTool GenImage -c PE -x -b 0x10000 -o "${BUILD_DIR_ARCH}/EfiLoaderRebased.efi" "${BUILD_DIR_ARCH}/EfiLoader.efi" || exit 1
+  # Reuse DEBUG EfiLdr in NOOPT build to keep within allotted 0x10000-0x20000 space.
+  # With this approach, everything after EfiLdr is fully NOOPT, but EfiLdr starts.
+  # TODO: Look at moving EFILDR_BASE_SEGMENT (see also kBoot2Segment, BASE_ADDR_32)
+  # to make space for NOOPT loader.
+  SAFE_LOADER=$(echo "${BUILD_DIR_ARCH}/EfiLoader.efi" | sed -e 's/NOOPT/DEBUG/')
+  ImageTool GenImage -c PE -x -b 0x10000 -o "${BUILD_DIR_ARCH}/EfiLoaderRebased.efi" "${SAFE_LOADER}" || exit 1
 
   "${FV_TOOLS}/EfiLdrImage" -o "${BUILD_DIR}/FV/Efildr${arch}" \
     "${BUILD_DIR_ARCH}/EfiLoaderRebased.efi" "${BUILD_DIR}/FV/DxeIpl${arch}.z" \
@@ -75,7 +81,7 @@ imgbuild() {
   # Build bootsectors.
   mkdir -p "${BOOTSECTORS}" || exit 1
   cd "${BOOTSECTORS}"/.. || exit 1
-  make || exit 1
+  make "${arch}" || exit 1
   cd - || exit 1
 
   # Concatenate bootsector into the resulting image.
@@ -174,7 +180,7 @@ if [ "${INTREE}" != "" ]; then
   imgbuild "${TARGETARCH}"
 else
   if [ "$TARGETS" = "" ]; then
-    TARGETS=(DEBUG RELEASE)
+    TARGETS=(DEBUG RELEASE NOOPT)
     export TARGETS
   fi
   if [ "$ARCHS" = "" ]; then
@@ -182,12 +188,12 @@ else
     export ARCHS
   fi
 
-  DISCARD_PACKAGES=OpenCorePkg
+  DISCARD_SUBMODULES=OpenCorePkg
   SELFPKG_DIR="OpenCorePkg"
   SELFPKG=OpenDuetPkg
   NO_ARCHIVES=1
 
-  export DISCARD_PACKAGES
+  export DISCARD_SUBMODULES
   export SELFPKG_DIR
   export SELFPKG
   export NO_ARCHIVES

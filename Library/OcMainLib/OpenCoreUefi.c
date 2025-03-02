@@ -697,6 +697,7 @@ OcLoadBooterUefiSupport (
   AbcSettings.AllowRelocationBlock   = Config->Booter.Quirks.AllowRelocationBlock;
   AbcSettings.EnableSafeModeSlide    = Config->Booter.Quirks.EnableSafeModeSlide;
   AbcSettings.EnableWriteUnprotector = Config->Booter.Quirks.EnableWriteUnprotector;
+  AbcSettings.ClearTaskSwitchBit     = Config->Booter.Quirks.ClearTaskSwitchBit;
   AbcSettings.ForceExitBootServices  = Config->Booter.Quirks.ForceExitBootServices;
   AbcSettings.ForceBooterSignature   = Config->Booter.Quirks.ForceBooterSignature;
   CopyMem (AbcSettings.BooterSignature, Signature, sizeof (AbcSettings.BooterSignature));
@@ -897,9 +898,11 @@ OcLoadUefiSupport (
   EFI_EVENT   Event;
   BOOLEAN     AccelEnabled;
 
+  OcUnloadDrivers (Config);
+
   OcReinstallProtocols (Config);
 
-  OcImageLoaderInit (Config->Booter.Quirks.ProtectUefiServices);
+  OcImageLoaderInit (Config->Booter.Quirks.ProtectUefiServices, Config->Booter.Quirks.FixupAppleEfiImages);
 
   OcLoadAppleSecureBoot (Config, CpuInfo);
 

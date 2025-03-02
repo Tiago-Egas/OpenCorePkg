@@ -10,7 +10,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
-  PeLoader.h
+  Debug.h
 
 Abstract:
 
@@ -18,24 +18,27 @@ Revision History:
 
 --*/
 
-#ifndef _EFILDR_PELOADER_H_
-#define _EFILDR_PELOADER_H_
+#ifndef _EFILDR_DEBUG_H_
+#define _EFILDR_DEBUG_H_
 
-#include "EfiLdr.h"
+#include <Library/PrintLib.h>
+#include <Library/SerialPortLib.h>
 
-EFI_STATUS
-EfiLdrGetPeImageInfo (
-  IN VOID     *FHand,
-  OUT UINT64  *ImageBase,
-  OUT UINT32  *ImageSize
+VOID
+PrintHeader (
+  CHAR8  Char
   );
 
-EFI_STATUS
-EfiLdrPeCoffLoadPeImage (
-  IN VOID                   *FHand,
-  IN EFILDR_LOADED_IMAGE    *Image,
-  IN UINTN                  *NumberOfMemoryMapEntries,
-  IN EFI_MEMORY_DESCRIPTOR  *EfiMemoryDescriptor
+VOID
+EFIAPI
+PrintString (
+  IN CONST CHAR8  *FormatString,
+  ...
+  );
+
+VOID
+ClearScreen (
+  VOID
   );
 
 #endif
